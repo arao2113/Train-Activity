@@ -1,10 +1,10 @@
-// Initialize firebase
-  var config = {
+// Initialize Firebase
+var config = {
     apiKey: "AIzaSyCNbWE-sC3NW8j5SHA2odl4_p1MTp5zOQA",
     authDomain: "train-activity-4d1cc.firebaseapp.com",
     databaseURL: "https://train-activity-4d1cc.firebaseio.com",
     projectId: "train-activity-4d1cc",
-    storageBucket: "",
+    storageBucket: "train-activity-4d1cc.appspot.com",
     messagingSenderId: "272897010511"
   };
 
@@ -40,7 +40,16 @@ $("#add-train").on("click", function(event) {
     console.log(newTrain.time);
     console.log(newTrain.frequency);
 
-    var conTime = moment.unix(time).format("LT");
+
+    // Time Conversions
+    var timeCont = moment(time, "HH:mm").subtract(1, "years");
+    var currentTime = moment();
+    var diffTime = moment().diff(moment(timeCont), "minutes");
+    var tRemainder = diffTime % frequency;
+    var minutesTrain = frequency - tRemainder;
+    var nextTrain = moment().add(minutesTrain, "minutes");
+    var nextTrainCon = moment(nextTrain).format("hh:mm a");
+    
 
     //Clear all boxes
     $("#train-name").val("");
@@ -52,9 +61,27 @@ $("#add-train").on("click", function(event) {
         $("<td>").text(tName),
         $("<td>").text(destination),
         $("<td>").text(frequency),
-        $("<td>").text(conTime)
+        $("<td>").text(nextTrainCon),
+        $("<td>").text(minutesTrain)
     );
 
     //Append to table
     $("#train-table > tbody").append(newRow);
+})
+
+database.ref().on("child_added", function(childSnapshot) {
+    console.log(childSnapshot.val());
+
+    //Store into variables
+    var tname = childSnapshot.val().name;
+    var destination = childSnapshot.val().destination;
+    var frequency = childSnapshot.val().frequency;
+    var nextTrainCon = childSnapshot.val();
+    var minutesTrain = childSnapshot.val();
+
+    //Train Info
+    console.log(tname);
+    console.log(destination);
+    console.log(frequency);
+    console.log(conTime);
 })
